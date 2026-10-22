@@ -10,6 +10,8 @@ namespace Adv_Session02_Delegates
         static void Main(string[] args)
         {
           
+
+
         }
     }
     #endregion

@@ -102,6 +102,41 @@ namespace Adv_Session02_Delegates
             Console.WriteLine("\n");
             #endregion
 
+            #region Task 03.2: Transform Products (Func<Product, TResult>)
+            /*
+            --------------------------------------------------------------------------------
+            TASK 03.2: TRANSFORM PRODUCTS (Func<Product, TResult>)
+            --------------------------------------------------------------------------------
+            Delegate Used: Func<Product, TResult>
+            Why: Func<T, TResult> is used for mapping/projections. It takes an input entity
+                 and returns a newly computed or formatted representation of type TResult.
+                 This is the exact underlying design pattern of LINQ's .Select() extension.
+            --------------------------------------------------------------------------------
+            */
+            Console.WriteLine("--------------------------------------------------");
+            Console.WriteLine("TASK 03.2: TRANSFORM PRODUCTS (Func<Product, TResult>)");
+            Console.WriteLine("--------------------------------------------------");
+
+            // Scenario 3: Summary List: Name ($Price)
+            Console.WriteLine("--- Summary List ---");
+            List<string> summaryList = ProductTransformer.TransformProducts(catalog, p => $"{p.Name} (${p.Price})");
+            foreach (var item in summaryList)
+            {
+                Console.WriteLine(item);
+            }
+            Console.WriteLine();
+
+            // Scenario 4: Price Label: "Expensive!" if Price > 100 else "Affordable"
+            Console.WriteLine("--- Price Labels ---");
+            List<string> priceLabels = ProductTransformer.TransformProducts(catalog, p =>
+                $"{p.Name}: {(p.Price > 100 ? "Expensive!" : "Affordable")}");
+            foreach (string label in priceLabels)
+            {
+                Console.WriteLine(label);
+            }
+            Console.WriteLine("\n");
+            #endregion
+
 
 
         }

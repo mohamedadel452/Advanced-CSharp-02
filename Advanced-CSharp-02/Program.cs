@@ -76,6 +76,32 @@ namespace Adv_Session02_Delegates
             #endregion
             #endregion
 
+            #region Task 03.1: Print Reports (Action<Product>)
+            /*
+            --------------------------------------------------------------------------------
+            TASK 03.1: CUSTOM REPORT GENERATOR - PRINT REPORTS
+            --------------------------------------------------------------------------------
+            Delegate Used: Action<Product>
+            Why: Action<T> represents an operation that takes an input and returns void.
+                 It is ideal for console printing, logging, or rendering where the caller
+                 specifies the format and side-effect without producing a return value.
+            --------------------------------------------------------------------------------
+            */
+            Console.WriteLine("--------------------------------------------------");
+            Console.WriteLine("TASK 03.1: PRINT REPORTS (Action<Product>)");
+            Console.WriteLine("--------------------------------------------------");
+
+            // Scenario 1: Short Report (Name - $Price)
+            Console.WriteLine("--- Short Report ---");
+            ReportEngine.PrintReport(catalog, p => Console.WriteLine(p.ToShortString()));
+            Console.WriteLine();
+
+            // Scenario 2: Detailed Report ([Category] Name | Price: $X | Stock: Y)
+            Console.WriteLine("--- Detailed Report ---");
+            ReportEngine.PrintReport(catalog, p => Console.WriteLine(p.ToDetailedString()));
+            Console.WriteLine("\n");
+            #endregion
+
 
 
         }

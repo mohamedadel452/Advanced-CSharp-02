@@ -137,6 +137,31 @@ namespace Adv_Session02_Delegates
             Console.WriteLine("\n");
             #endregion
 
+            #region Task 03.3: Filter Products (Predicate<Product>)
+            /*
+            --------------------------------------------------------------------------------
+            TASK 03.3: FILTER PRODUCTS (Predicate<Product>)
+            --------------------------------------------------------------------------------
+            Delegate Used: Predicate<Product>
+            Why: Predicate<T> is explicitly designed for conditional criteria evaluation.
+                 It is equivalent to Func<T, bool> and communicates semantic intent:
+                 evaluating whether a product meets a specific business condition (Low Stock).
+            --------------------------------------------------------------------------------
+            */
+            Console.WriteLine("--------------------------------------------------");
+            Console.WriteLine("TASK 03.3: FILTER PRODUCTS (Predicate<Product>)");
+            Console.WriteLine("--------------------------------------------------");
+
+            // Scenario 5: Low-Stock Alert: Find products with Stock < 20
+            Console.WriteLine("--- Low-Stock Alert ---");
+            List<Product> lowStockProducts = ProductFilter.FilterProducts(catalog, p => p.Stock < 20);
+            foreach (var p in lowStockProducts)
+            {
+                Console.WriteLine($"[LOW STOCK] {p.Name}: only {p.Stock} left!");
+            }
+            Console.WriteLine("\n");
+            #endregion
+
 
 
         }

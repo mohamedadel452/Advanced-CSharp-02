@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Delegates (3/3): حل الأسئلة والتصحيحات والمراجع</title>
+<style>
+:root{--bg:#f6f7f4;--fg:#1d2327;--mut:#5b6670;--card:#fff;--line:#d9ded8;--acc:#0b6b5c;--warn:#a4440f;--warnbg:#fdf0e6;--code:#10201c;--codefg:#d7efe6;--okbg:#e6f4ef}
+@media(prefers-color-scheme:dark){:root{--bg:#121816;--fg:#e4ebe8;--mut:#9aa8a3;--card:#1a2320;--line:#2c3834;--acc:#4fc2a8;--warn:#f0a066;--warnbg:#2b2118;--code:#0b1210;--okbg:#17302a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.9 "Segoe UI",Tahoma,"Noto Naskh Arabic",system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+main{max-width:900px;margin:0 auto;padding:28px 18px 80px}
+h1{font-size:1.9rem;line-height:1.4;margin:.2em 0}
+h2{font-size:1.4rem;margin:2.2em 0 .5em;padding-inline-start:12px;border-inline-start:5px solid var(--acc)}
+h3{font-size:1.05rem;margin:1.5em 0 .2em;color:var(--acc)}
+p{margin:.55em 0}.lead{color:var(--mut)}
+a{color:var(--acc)}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+nav a{color:var(--fg);text-decoration:none;border:1px solid var(--line);background:var(--card);padding:3px 12px;border-radius:6px;font-size:.88rem}
+pre{direction:ltr;text-align:left;background:var(--code);color:var(--codefg);padding:13px 16px;border-radius:8px;overflow-x:auto;font:13.5px/1.55 Consolas,Menlo,monospace;margin:.6em 0}
+code{direction:ltr;unicode-bidi:embed;font-family:Consolas,Menlo,monospace;font-size:.9em;background:var(--okbg);padding:1px 6px;border-radius:4px}
+pre code{background:none;padding:0;font-size:inherit}
+.box{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:4px 16px;margin:1em 0}
+.warn{background:var(--warnbg);border-color:var(--warn)}.warn .t{color:var(--warn)}
+.ok{background:var(--okbg);border-color:var(--acc)}
+.tw{overflow-x:auto;margin:1em 0}
+table{border-collapse:collapse;width:100%;min-width:560px;background:var(--card)}
+th,td{border:1px solid var(--line);padding:7px 12px;text-align:start;vertical-align:top;font-size:.93rem}
+th{background:var(--okbg)}
+td.n{width:2.5em;text-align:center;font-weight:700}
+li{margin:.3em 0}
+footer{margin-top:3em;color:var(--mut);font-size:.9rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Delegates (الجزء 3 من 3): حل الأسئلة والتصحيحات والمراجع</h1>
+<p class="lead">السلايدات فيها أسئلة Quick Think من غير إجابات (سلايد 20 و 21 و 31 و 32). هنا إجابات مع التفسير، وبعلامة ⚠ على الأسئلة اللي فيها فخ أو أكتر من إجابة صحيحة.</p>
+<nav><a href="#q">1. حل الأسئلة</a><a href="#c">2. تصحيحات</a><a href="#i">3. أسئلة مقابلات</a><a href="#s">4. ملخص اختيار</a><a href="#r">5. مراجع</a><a href="#x">6. تمرين</a></nav>
+
+<h2 id="q">1) حل أسئلة Quick Think</h2>
+<h3>سلايد 20: الأنواع المدمجة</h3>
+<div class="tw"><table>
+<tr><th>#</th><th>الإجابة</th><th>التفسير</th></tr>
+<tr><td class="n">1</td><td><b>A</b> <code>Action</code></td><td>من غير parameters ومن غير return. <code>Func&lt;void&gt;</code> غير موجود لأن <code>void</code> مش type argument صالح.</td></tr>
+<tr><td class="n">2</td><td><b>B</b> <code>Func&lt;int,int,int&gt;</code></td><td>آخر type = الـ return، والباقي parameters. الخيار D (<code>Func&lt;int,int&gt;</code>) بياخد واحد.</td></tr>
+<tr><td class="n">3</td><td><b>B</b> double</td><td>آخر type parameter هو نوع الـ return.</td></tr>
+<tr><td class="n">4 ⚠</td><td><b>B أو C</b></td><td>الاتنين صح تقنياً (<code>Func&lt;T,bool&gt;</code> و <code>Predicate&lt;T&gt;</code>)، والسلايد غالباً يقصد C. في المقابلات اذكر الاتنين واشرح الفرق.</td></tr>
+<tr><td class="n">5</td><td><b>A</b> Hello World</td><td>method group conversion: <code>Console.WriteLine</code> فيها overloads كتير، والـ compiler يختار <code>WriteLine(string)</code> لأن الهدف <code>Action&lt;string&gt;</code>.</td></tr>
+<tr><td class="n">6</td><td><b>C</b> 10</td><td><code>(4,6) =&gt; 4+6</code>.</td></tr>
+</table></div>
+<h3>سلايد 21</h3>
+<div class="tw"><table>
+<tr><th>#</th><th>الإجابة</th><th>التفسير</th></tr>
+<tr><td class="n">7</td><td><b>B</b> False</td><td>7 % 2 = 1 فالشرط <code>== 0</code> خاطئ.</td></tr>
+<tr><td class="n">8 ⚠</td><td><b>A و C</b></td><td>معرّفة في <code>System</code> وgeneric و type-safe. B غلط (مش للـ async بس)، D غلط (بتتكتب بالـ lambda طول الوقت).</td></tr>
+<tr><td class="n">9</td><td><b>A</b> Number: 5</td><td>الـ <code>$"..."</code> interpolation تستبدل <code>{n}</code>.</td></tr>
+<tr><td class="n">10</td><td><b>A</b> <code>Action&lt;int,int,int&gt;</code></td><td>3 parameters ومن غير return.</td></tr>
+<tr><td class="n">11</td><td><b>B</b> 7</td><td>3.5 × 2 = 7 (بتتطبع <code>7</code> مش <code>7.0</code>).</td></tr>
+<tr><td class="n">12 ⚠</td><td><b>B</b> (أو C)</td><td><code>Func&lt;string,bool&gt; check = string.IsNullOrEmpty;</code> والـ <code>Predicate&lt;string&gt;</code> برضه صح.</td></tr>
+</table></div>
+<h3>سلايد 31: Anonymous methods و Lambdas</h3>
+<div class="tw"><table>
+<tr><th>#</th><th>الإجابة</th><th>التفسير</th></tr>
+<tr><td class="n">1 ⚠</td><td><b>C و D</b></td><td>الاتنين anonymous methods (<code>delegate { }</code> بدون قائمة parameters مسموح). A بتاعة lambda وB (<code>function()</code>) مش C#.</td></tr>
+<tr><td class="n">2 ⚠</td><td><b>B</b> (و A و C كمان)</td><td>A و B و C كلهم يعادلوا الـ anonymous method. D غلط لأن <code>{ x * x; }</code> مش statement صالح ومفيش return.</td></tr>
+<tr><td class="n">3</td><td><b>A</b> Hi Ahmed</td><td>الـ "name" متغير مش نص.</td></tr>
+<tr><td class="n">4 ⚠</td><td><b>A و B و C</b></td><td>كلهم lambdas بـ parameterين. D ينقصه فاصلة وأقواس.</td></tr>
+<tr><td class="n">5 ⚠</td><td><b>D</b> Compilation Error</td><td><b>الفخ:</b> <code>Func&lt;int,int&gt;</code> بياخد parameter واحد، لكن الـ anonymous method تاخد <code>(int a, int b)</code>. الخطأ CS1593 (delegate does not take 2 arguments). المقصود غالباً <code>Func&lt;int,int,int&gt;</code>.</td></tr>
+<tr><td class="n">6</td><td><b>C</b> by reference</td><td>بيمسك المتغير نفسه (قسم 5 في الجزء 2). B غلط، و D غلط (بيقدر يمسك أي متغير).</td></tr>
+</table></div>
+<h3>سلايد 32</h3>
+<div class="tw"><table>
+<tr><th>#</th><th>الإجابة</th><th>التفسير</th></tr>
+<tr><td class="n">7</td><td><b>B</b> Lambda</td><td><code>() =&gt; Console.WriteLine("Done")</code>.</td></tr>
+<tr><td class="n">8</td><td><b>B</b> Odd</td><td>9 % 2 = 1 فالـ else بتتنفذ. والـ delegate هنا anonymous method.</td></tr>
+<tr><td class="n">9 ⚠</td><td><b>B</b> <code>n =&gt; n &gt; 0</code></td><td>الأقصر. C أيضاً صح لكن بأقواس زيادة.</td></tr>
+<tr><td class="n">10</td><td><b>B</b> CSharp!</td><td><code>s + "!"</code>.</td></tr>
+<tr><td class="n">11</td><td><b>B</b></td><td>A غلط (الاتنين بيتحولوا لـ delegates)، C غلط (الـ anonymous methods لها block body بس)، D غلط (الـ lambda بتعمل capture).</td></tr>
+<tr><td class="n">12 ⚠</td><td><b>A</b> (و C صح كمان)</td><td>B غلط: <code>{ s.Length; }</code> ما فيهاش return ولا statement. D ترتيب النوع والاسم معكوس.</td></tr>
+</table></div>
+
+<h2 id="c">2) تصحيحات وملاحظات على السلايدات</h2>
+<div class="box ok"><ol>
+<li><b>سلايد 25:</b> "Lambdas are syntactic sugar over anonymous methods". غير دقيق، الـ lambda تتحول لـ Expression Tree والـ anonymous method لأ، وفي natural type (جزء 2 قسم 3).</li>
+<li><b>سلايد 4:</b> "function pointer": تبسيط. الـ delegate object بيحمل <code>Target</code> و <code>Method</code>، وده سبب الـ memory leak (جزء 1 قسم 7).</li>
+<li><b>سلايد 7 و 8:</b> "signature must match exactly": ما فيهاش ذكر لـ variance للـ reference types (جزء 1 قسم 4).</li>
+<li><b>سلايد 5 و 6:</b> نفس المحتوى مكرر.</li>
+<li><b>سلايد 26:</b> سؤالين Generics (<code>Print&lt;T&gt;</code> و <code>Echo&lt;T&gt;</code>) منقولين من جلسة تانية وخارج موضوع الـ Delegates. ونفس الإشكالات اللي ذكرتها قبل كده (الإجابة 100 C# في سطر واحد بينما الناتج سطرين).</li>
+<li><b>أسئلة سلايد 20 و 21 و 31 و 32:</b> عدة أسئلة فيها أكتر من إجابة صحيحة (⚠ فوق)، وكلها من غير مفتاح إجابة. ما تحفظش حرف الإجابة، افهم السبب.</li>
+</ol></div>
+
+<h2 id="i">3) أسئلة مقابلات شائعة على الموضوع</h2>
+<div class="tw"><table>
+<tr><th>السؤال</th><th>إجابة مختصرة تظهر العمق</th></tr>
+<tr><td>إيه الـ delegate داخلياً؟</td><td>class مولّد يرث <code>MulticastDelegate</code> فيه Target و Method و invocation list، reference type و immutable.</td></tr>
+<tr><td>الفرق بين delegate و event؟</td><td>الـ event بيقيّد الوصول من برّه: <code>+=</code> و <code>-=</code> بس، ومفيش استدعاء أو تعيين من خارج الـ class.</td></tr>
+<tr><td>إيه بيحصل لو multicast delegate بيرجع قيمة؟</td><td>آخر دالة هي اللي تتحفظ نتيجتها، والباقي يضيع. استخدم <code>GetInvocationList()</code>.</td></tr>
+<tr><td>إزاي ممكن delegate يسبب memory leak؟</td><td>الاشتراك في event لـ publisher طويل العمر بيخلي الـ Target (الـ subscriber) محجوز من الـ GC.</td></tr>
+<tr><td>الفرق بين Func و Predicate؟</td><td>Predicate يرجع bool وbاراميتر واحد، وFunc&lt;T,bool&gt; هو المعيار في LINQ، وهما نوعين غير قابلين للتحويل الضمني.</td></tr>
+<tr><td>إيه الـ closure؟</td><td>lambda بتمسك متغيرات من الـ scope اللي حواليها بالمرجع، والمترجم بيرفعها لحقول في class على الـ Heap.</td></tr>
+<tr><td>ليه <code>for</code> بيدي 3 3 3 و <code>foreach</code> لأ؟</td><td>متغير الـ for واحد لكل الحلقة، وforeach بيعمل متغير جديد لكل دورة منذ C# 5.</td></tr>
+<tr><td>Func مقابل Expression&lt;Func&gt;؟</td><td>الأول كود قابل للتنفيذ، والتاني شجرة بيانات تتحول لـ SQL في EF. استخدام Func على IQueryable بيجيب الجدول كله.</td></tr>
+<tr><td>إيه الخطر في <code>async</code> lambda مع Action؟</td><td>بتبقى <code>async void</code>: مفيش انتظار والأخطاء ممكن تقفل الـ process. استخدم <code>Func&lt;Task&gt;</code>.</td></tr>
+<tr><td>إمتى أفضّل interface على delegate؟</td><td>لما العقد أكتر من دالة، أو محتاج تسجيله وحقنه في الـ DI.</td></tr>
+</table></div>
+
+<h2 id="s">4) ملخص: أستخدم أنهي نوع؟</h2>
+<div class="tw"><table>
+<tr><th>الحالة</th><th>الاختيار</th></tr>
+<tr><td>أنفذ حاجة من غير نتيجة</td><td><code>Action</code> أو <code>Action&lt;T&gt;</code></td></tr>
+<tr><td>أحسب أو أحوّل</td><td><code>Func&lt;T,TResult&gt;</code></td></tr>
+<tr><td>شرط لـ <code>List.FindAll/Exists</code></td><td><code>Predicate&lt;T&gt;</code></td></tr>
+<tr><td>شرط لـ LINQ على الذاكرة</td><td><code>Func&lt;T,bool&gt;</code></td></tr>
+<tr><td>شرط لـ EF Core (SQL)</td><td><code>Expression&lt;Func&lt;T,bool&gt;&gt;</code></td></tr>
+<tr><td>callback async</td><td><code>Func&lt;Task&gt;</code> أو <code>Func&lt;T,Task&gt;</code></td></tr>
+<tr><td>فيه <code>out</code> أو <code>ref</code> أو محتاج اسم معبّر</td><td><code>delegate</code> خاص</td></tr>
+<tr><td>إشعار لأكتر من مستمع</td><td><code>event EventHandler&lt;T&gt;</code></td></tr>
+</table></div>
+
+<h2 id="r">5) مراجع للتوسع (من Medium وغيره)</h2>
+<p>ده ملخص بكلامي لما لقيته في الصفحات، وقريت المقتطفات اللي ظهرت لي في البحث مش كل مقال بالكامل. راجع المقال نفسه قبل ما تعتمد على أي تفصيلة.</p>
+<ul>
+<li><a href="https://ravindradevrani.medium.com/generic-delegates-action-unc-predicate-in-c-100c5251e554" target="_blank" rel="noopener">Generic Delegates (Action, Func, Predicate) in C#</a> (Medium): بيشرح الـ generic delegate بمثال square و upper، وبعدين الأنواع الثلاثة الجاهزة مع أمثلة بعدد parameters مختلف.</li>
+<li><a href="https://medium.com/@shreyans_padmani/actions-predicate-and-func-e3b873ba3b49" target="_blank" rel="noopener">Actions, Predicate, and Func</a> (Medium): ملخص قصير للقاعدة: Action و Func من 0 إلى 16 parameter، وPredicate بـ parameter واحد بالظبط.</li>
+<li><a href="https://medium.com/@jepozdemir/func-vs-predicate-vs-expression-in-c-net-0bfff5caefcf" target="_blank" rel="noopener">Func vs. Predicate vs. Expression</a> (Medium): بيفرق بين التنفيذ المباشر (Func/Predicate) والـ Expression اللي ممكن تتحول لكود بـ <code>Compile()</code>، وده يكمل قسم 6 في الجزء 2.</li>
+<li><a href="https://medium.com/nerd-for-tech/c-delegates-actions-events-summary-please-8fab0244a40a" target="_blank" rel="noopener">C# Delegates, Actions, Events: summary</a> (Medium): الرابط ده جه ذكره في إجابة على Microsoft Q&amp;A كملخص للـ delegates والـ events، ومافتحتوش بنفسي.</li>
+<li><a href="https://learn.microsoft.com/en-us/answers/questions/1664718/func-action-predicate-delegates-events-in-c" target="_blank" rel="noopener">Func, Action, Predicate delegates, events in C#</a> (Microsoft Q&amp;A): فيه تنبيه إن <code>out</code> مش بتتكتب في <code>Func</code> وإن الـ event بيسمح بالتسجيل وإلغاء التسجيل من أكتر من مكان.</li>
+<li><a href="https://www.i-programmer.info/programming/c/831-closure.html" target="_blank" rel="noopener">Deep C#: Anonymous Methods, Lambdas And Closures</a> (I Programmer): بيشرح إن C# بتمسك المتغير مش قيمته، ومثال الحلقة اللي كل الـ delegates بتشارك فيه نفس المتغير.</li>
+<li><a href="https://coddy.tech/docs/csharp/lambda-expressions" target="_blank" rel="noopener">C# Lambda Expressions</a> (Coddy): بيوضح مشكلة for loop capture مقابل foreach والحل بنسخ المتغير جوه الحلقة.</li>
+</ul>
+
+<h2 id="x">6) تمرين تطبيقي: Order Pipeline بالـ Delegates</h2>
+<p>ابني pipeline لمعالجة طلب، كل خطوة delegate، بحيث تضيف خطوة جديدة من غير تعديل الـ pipeline نفسه.</p>
+<pre><code>public record Order(int Id, decimal Total, string Status = "New");
+
+public class OrderPipeline
+{
+    private readonly List&lt;(string Name, Func&lt;Order, Task&lt;bool&gt;&gt; Step)&gt; _steps = new();
+
+    public OrderPipeline Add(string name, Func&lt;Order, Task&lt;bool&gt;&gt; step) { _steps.Add((name, step)); return this; }
+
+    public async Task&lt;(bool Ok, string? FailedAt)&gt; RunAsync(Order o)
+    {
+        foreach (var (name, step) in _steps)
+            if (!await step(o)) return (false, name);     // يوقف عند أول فشل
+        return (true, null);
+    }
+}
+
+var pipeline = new OrderPipeline()
+    .Add("Validate", o =&gt; Task.FromResult(o.Total &gt; 0))
+    .Add("Charge",   async o =&gt; { await Task.Delay(50); return o.Total &lt; 10_000; })
+    .Add("Notify",   o =&gt; { Console.WriteLine($"Order {o.Id} done"); return Task.FromResult(true); });
+
+Console.WriteLine(await pipeline.RunAsync(new Order(1, 500)));       // (True, )
+Console.WriteLine(await pipeline.RunAsync(new Order(2, 50_000)));    // (False, Charge)</code></pre>
+<p><b>مطلوب منك:</b></p>
+<ol>
+<li>أضف خطوة Logging تتنفذ <b>قبل وبعد</b> كل خطوة (فكّر: دالة بتاخد <code>Func</code> وترجع <code>Func</code> يلفّها).</li>
+<li>غيّر الـ pipeline ليتجاهل الخطوات اللي بترمي exception ويسجلها بدل ما يقف، باستخدام <code>try/catch</code> داخل الحلقة.</li>
+<li>أضف <code>Retry</code> (من الجزء 2) على خطوة Charge فقط.</li>
+<li>حوّل الـ pipeline لـ events: <code>event Action&lt;string&gt;? StepFailed</code> واشترك فيه، وبعدها اشرح لنفسك ليه لازم تفك الاشتراك.</li>
+<li>اكتب اختبار يثبت إن خطوة Notify ما بتتنفذش لو Charge فشلت.</li>
+</ol>
+<footer>الأجزاء الثلاثة: Part1 (الأساس) و Part2 (Lambda و Closures) و Part3 (الحل والمراجع). الكود كله من فهمي ولم أشغله هنا، فجرّبه عندك.</footer>
+</main>
+</body>
+</html>

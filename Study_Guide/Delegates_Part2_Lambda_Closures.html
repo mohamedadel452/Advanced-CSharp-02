@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Delegates (2/3): Built-in و Anonymous و Lambda و Closures</title>
+<style>
+:root{--bg:#f6f7f4;--fg:#1d2327;--mut:#5b6670;--card:#fff;--line:#d9ded8;--acc:#0b6b5c;--warn:#a4440f;--warnbg:#fdf0e6;--code:#10201c;--codefg:#d7efe6;--okbg:#e6f4ef}
+@media(prefers-color-scheme:dark){:root{--bg:#121816;--fg:#e4ebe8;--mut:#9aa8a3;--card:#1a2320;--line:#2c3834;--acc:#4fc2a8;--warn:#f0a066;--warnbg:#2b2118;--code:#0b1210;--okbg:#17302a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.9 "Segoe UI",Tahoma,"Noto Naskh Arabic",system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+main{max-width:900px;margin:0 auto;padding:28px 18px 80px}
+h1{font-size:1.9rem;line-height:1.4;margin:.2em 0}
+h2{font-size:1.4rem;margin:2.2em 0 .5em;padding-inline-start:12px;border-inline-start:5px solid var(--acc)}
+h3{font-size:1.05rem;margin:1.5em 0 .2em;color:var(--acc)}
+p{margin:.55em 0}.lead{color:var(--mut)}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+nav a{color:var(--fg);text-decoration:none;border:1px solid var(--line);background:var(--card);padding:3px 12px;border-radius:6px;font-size:.88rem}
+nav a:hover{border-color:var(--acc);color:var(--acc)}
+pre{direction:ltr;text-align:left;background:var(--code);color:var(--codefg);padding:13px 16px;border-radius:8px;overflow-x:auto;font:13.5px/1.55 Consolas,Menlo,monospace;margin:.6em 0}
+code{direction:ltr;unicode-bidi:embed;font-family:Consolas,Menlo,monospace;font-size:.9em;background:var(--okbg);padding:1px 6px;border-radius:4px}
+pre code{background:none;padding:0;font-size:inherit}
+.box{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:4px 16px;margin:1em 0}
+.warn{background:var(--warnbg);border-color:var(--warn)}.warn .t{color:var(--warn)}
+.tw{overflow-x:auto;margin:1em 0}
+table{border-collapse:collapse;width:100%;min-width:520px;background:var(--card)}
+th,td{border:1px solid var(--line);padding:7px 12px;text-align:start;vertical-align:top;font-size:.93rem}
+th{background:var(--okbg)}
+.dg{direction:ltr;overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px;margin:.8em 0}
+.dg svg{min-width:720px;width:100%;height:auto;display:block}
+.bx{fill:var(--card);stroke:var(--acc);stroke-width:1.5}
+.hd{font:700 12.5px Consolas,Menlo,monospace;fill:var(--acc)}.tx{font:11.5px Consolas,Menlo,monospace;fill:var(--fg)}
+.ln{stroke:var(--fg);stroke-width:1.3;fill:none}.ds{stroke-dasharray:5 3}.op{fill:none;stroke:var(--fg)}
+li{margin:.25em 0}
+footer{margin-top:3em;color:var(--mut);font-size:.9rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Delegates (الجزء 2 من 3): Built-in و Anonymous و Lambda و Closures</h1>
+<p class="lead">سلايدات 14 إلى 32. هنا الجزء اللي بتستخدمه كل يوم في LINQ و ASP.NET و EF Core، وفيه أخطر المشاكل: الـ closures و async lambdas و Func مقابل Expression.</p>
+<nav><a href="#a">1. Built-in</a><a href="#b">2. Func/Predicate</a><a href="#c">3. Anonymous</a><a href="#d">4. Lambda</a><a href="#e">5. Closures</a><a href="#f">6. Expression</a><a href="#g">7. async</a><a href="#h">8. أنماط</a></nav>
+
+<h2 id="a">1) ليه Built-in Delegates؟ (سلايد 15 إلى 19)</h2>
+<p>في الأول كل مبرمج كان يعرّف delegate خاص بيه لكل شكل (<code>delegate void LogHandler(string s)</code>) وبتتكرر مئات المرات. من .NET 2.0 و 3.5 المكتبة عرّفت أشكال عامة (generic) جاهزة في <code>System</code>، وبقت الأنواع القياسية اللي كل الـ APIs بتتفق عليها.</p>
+<div class="tw"><table>
+<tr><th>النوع</th><th>الشكل</th><th>Parameters</th><th>الاستخدام</th></tr>
+<tr><td><code>Action</code></td><td>يرجع void</td><td>0 إلى 16</td><td>تنفيذ شيء (callbacks, ForEach)</td></tr>
+<tr><td><code>Func&lt;..., TResult&gt;</code></td><td>يرجع قيمة (آخر type parameter)</td><td>0 إلى 16</td><td>حساب وتحويل (LINQ Select)</td></tr>
+<tr><td><code>Predicate&lt;T&gt;</code></td><td>يرجع bool</td><td>1 بالظبط</td><td>شروط (<code>List.FindAll</code>)</td></tr>
+<tr><td><code>Comparison&lt;T&gt;</code></td><td>int</td><td>2 من T</td><td><code>List.Sort</code></td></tr>
+<tr><td><code>Converter&lt;TIn,TOut&gt;</code></td><td>TOut</td><td>1</td><td><code>List.ConvertAll</code></td></tr>
+</table></div>
+<pre><code>var nums = new List&lt;int&gt; { 5, 2, 8, 1 };
+nums.Sort((a, b) =&gt; b.CompareTo(a));           // Comparison&lt;int&gt;  → 8 5 2 1
+var evens = nums.FindAll(n =&gt; n % 2 == 0);       // Predicate&lt;int&gt;   → 8 2
+var texts = nums.ConvertAll(n =&gt; $"#{n}");      // Converter&lt;int,string&gt;
+nums.ForEach(Console.WriteLine);                 // Action&lt;int&gt;     (method group)
+
+Func&lt;int, int, int&gt; add = (a, b) =&gt; a + b;      // آخر type = الـ return
+Action&lt;string&gt; print = Console.WriteLine;        // اختار overload WriteLine(string)</code></pre>
+
+<h2 id="b">2) Func مقابل Predicate، وإمتى تكتب delegate خاص</h2>
+<ul>
+<li><b>Predicate&lt;T&gt;</b> قديم، ظهر مع الـ List&lt;T&gt; (.NET 2.0). و<b>Func&lt;T,bool&gt;</b> هو اللي استخدمه LINQ. ولو كتبت API جديد استخدم <code>Func&lt;T,bool&gt;</code> لأنه المعيار في الـ LINQ. (سلايد 20 سؤال 4 فيه إجابتين مقبولتين لنفس السبب.)</li>
+<li><b>ممنوع <code>ref</code> و <code>out</code> في Func/Action</b> لأنها type parameters عادية. لو محتاج، عرّف delegate خاص:</li>
+</ul>
+<pre><code>delegate bool TryParser&lt;T&gt;(string input, out T value);
+
+static bool ParseAll&lt;T&gt;(string[] items, TryParser&lt;T&gt; parser, out List&lt;T&gt; result)
+{
+    result = new();
+    foreach (var s in items)
+    {
+        if (!parser(s, out var v)) return false;
+        result.Add(v);
+    }
+    return true;
+}
+ParseAll(new[] { "1", "2" }, int.TryParse, out var ints);   // method group يختار الـ overload المناسب</code></pre>
+<p>وكمان لما تحتاج اسم يعبّر عن المعنى (<code>delegate decimal TaxPolicy(decimal amount)</code> أوضح للقارئ من <code>Func&lt;decimal,decimal&gt;</code> في API عام).</p>
+
+<h2 id="c">3) Anonymous Methods (سلايد 23 إلى 26)</h2>
+<p><b>الفكرة:</b> دالة من غير اسم بتكتبها في مكان استخدامها بدل ما تعرّف method منفصلة لاستخدام مرة واحدة.</p>
+<pre><code>Action&lt;string&gt; greet = delegate (string name) { Console.WriteLine($"Hello, {name}!"); };
+
+Func&lt;int, int, int&gt; multiply = delegate (int a, int b) { return a * b; };
+
+Action quick = delegate { Console.WriteLine("بدون parameters"); };   // قائمة الـ parameters ممكن تتشال</code></pre>
+<div class="tw"><table>
+<tr><th>النسخة</th><th>الشكل</th><th>إضافة</th></tr>
+<tr><td>C# 1.0</td><td><code>new Handler(MethodName)</code></td><td>named method بس</td></tr>
+<tr><td>C# 2.0</td><td><code>delegate (int x) { ... }</code></td><td>Anonymous methods و closures</td></tr>
+<tr><td>C# 3.0</td><td><code>x =&gt; ...</code></td><td>Lambda و LINQ و Expression Trees</td></tr>
+</table></div>
+<div class="box warn"><p><b class="t">تصحيح (سلايد 25):</b> السلايد بيقول إن الـ lambda "syntactic sugar over anonymous methods". ده مش دقيق. الاتنين بيتحولوا لنفس نوع الكود (closure و method مولّدة)، لكن الـ lambda ليها قدرات مالهاش anonymous method: (1) ممكن تتحول لـ <b>Expression Tree</b> (EF Core بيعتمد عليها)، (2) الـ <b>natural type</b> (C# 10)، (3) كتابة مختصرة بتقبل الاستنتاج. الـ anonymous method بتفيد في حالة واحدة: <code>delegate { }</code> لما ما تحتاجش الـ parameters.</p></div>
+
+<h2 id="d">4) Lambda Expressions (سلايد 28 إلى 30)</h2>
+<pre><code>Action sayHello = () =&gt; Console.WriteLine("Hello");               // من غير parameters
+Action&lt;string&gt; greet = name =&gt; Console.WriteLine($"Hi {name}");    // واحد: الأقواس اختيارية
+Func&lt;int, int, int&gt; mul = (x, y) =&gt; x * y;                         // أكتر: الأقواس إجبارية
+
+Func&lt;int, string&gt; kind = n =&gt;                                      // Statement lambda
+{
+    if (n &gt; 0) return "Positive";
+    return n &lt; 0 ? "Negative" : "Zero";
+};</code></pre>
+<h3>إمكانيات حديثة مهمة</h3>
+<pre><code>var square = (int x) =&gt; x * x;               // C# 10: natural type = Func&lt;int,int&gt;
+var log = (string m) =&gt; Console.WriteLine(m); // natural type = Action&lt;string&gt;
+Func&lt;int, int&gt; twice = static x =&gt; x * 2;   // C# 9: static lambda ممنوع يعمل capture</code></pre>
+<p><b>ليه الـ lambda "ملهاش نوع"؟</b> لأنها مجرد شكل. نفس الـ <code>x =&gt; x * 2</code> ممكن تتحول لـ <code>Func&lt;int,int&gt;</code> أو لـ <code>Expression&lt;Func&lt;int,int&gt;&gt;</code> أو لـ delegate خاص، والـ compiler بيختار من النوع المتوقع.</p>
+
+<h2 id="e">5) Closures: أهم وأخطر جزء</h2>
+<p>الـ lambda ممكن تستخدم متغيرات من الدالة اللي حواليها (سلايد 25 و 31 سؤال 6). السلايد بيقول الأسئلة، لكن مش بيشرح <b>إزاي</b>.</p>
+<pre><code>static Func&lt;int&gt; MakeCounter()
+{
+    int count = 0;
+    return () =&gt; ++count;       // بتستخدم count بعد ما MakeCounter تخلص!
+}
+var c1 = MakeCounter(); var c2 = MakeCounter();
+c1(); c1(); c2();
+Console.WriteLine($"{c1()} {c2()}");   // 3 2  (كل واحد عنده count خاص)</code></pre>
+<h3>الميكانيزم</h3>
+<p>المتغير <code>count</code> المفروض يموت لما الدالة تخلص (Stack). عشان كده المترجم <b>بيرفعه</b> لحقل في class مولّدة على الـ Heap، والـ lambda تتحول لـ method داخل نفس الـ class، والـ delegate بيشاور على object منها (Target).</p>
+<div class="dg">
+<svg viewBox="0 0 800 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Closure diagram">
+<defs><marker id="ar" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path class="op" d="M1 1L10 6L1 11"/></marker></defs>
+<rect class="bx" x="20" y="25" width="250" height="75" rx="4"/><text class="hd" x="30" y="44">MakeCounter() (الكود اللي كتبته)</text><text class="tx" x="30" y="63">int count = 0;</text><text class="tx" x="30" y="79">return () =&gt; ++count;</text>
+<rect class="bx" x="340" y="15" width="300" height="85" rx="4"/><text class="hd" x="350" y="34">&lt;&gt;c__DisplayClass0_0  (يولّده المترجم)</text><text class="tx" x="350" y="54">public int count;     ← اترفع للـ Heap</text><text class="tx" x="350" y="72">internal int b__0() =&gt; ++count;</text><text class="tx" x="350" y="90">(الـ lambda بقت method هنا)</text>
+<rect class="bx" x="340" y="145" width="300" height="75" rx="4"/><text class="hd" x="350" y="164">Func&lt;int&gt; c1 (delegate)</text><text class="tx" x="350" y="184">Target → DisplayClass object</text><text class="tx" x="350" y="200">Method → b__0</text>
+<path class="ln ds" d="M270 62H340" marker-end="url(#ar)"/><text class="tx" x="283" y="55">ينشئ</text>
+<path class="ln ds" d="M490 145V100" marker-end="url(#ar)"/>
+<text class="tx" x="660" y="170">كل استدعاء MakeCounter()</text><text class="tx" x="660" y="186">= DisplayClass جديد</text><text class="tx" x="660" y="202">= count مستقل</text>
+</svg></div>
+<h3>الحقائق المهمة</h3>
+<ul>
+<li>الـ closure بيمسك <b>المتغير نفسه</b> مش قيمته وقت الإنشاء (إجابة سلايد 31 سؤال 6: by reference).</li>
+<li>تغيير المتغير بعد إنشاء الـ lambda بيتشاف جواها، والعكس.</li>
+<li>عمر المتغير = عمر الـ delegate. لو الـ delegate اتخزن في static field، المتغير (وكل اللي بيشاور عليه) مش هيتجمع.</li>
+</ul>
+<div class="box warn"><p><b class="t">باگ كلاسيكي: for loop</b></p>
+<pre><code>var actions = new List&lt;Action&gt;();
+for (int i = 0; i &lt; 3; i++) actions.Add(() =&gt; Console.Write(i));
+actions.ForEach(a =&gt; a());              // 3 3 3   (i واحد مشترك، وقيمته بعد الحلقة 3)
+
+foreach (var n in new[] { 0, 1, 2 }) actions.Add(() =&gt; Console.Write(n));   // 0 1 2
+// ملحوظة: foreach بيعمل متغير جديد كل دورة من C# 5
+
+for (int i = 0; i &lt; 3; i++) { int copy = i; actions.Add(() =&gt; Console.Write(copy)); }   // الحل في for</code></pre>
+<p>ده بيظهر كتير في <code>Task.Run(() =&gt; Process(i))</code> داخل for: كل المهام بتشوف نفس <code>i</code> وقت التنفيذ.</p></div>
+<div class="box warn"><p><b class="t">التكلفة:</b> الـ lambda اللي <b>مش بتعمل capture</b> بيتخزن delegate واحد بتاعها في حقل static وبيتعاد استخدامه (من غير allocation). أما اللي بتعمل capture فبتنشئ DisplayClass و delegate جديدين <b>كل مرة</b> الدالة تتنادى. في hot path (ملايين الاستدعاءات) ده بيضغط على الـ GC. استخدم <code>static</code> lambda عشان المترجم يمنع الـ capture بالغلط.</p></div>
+
+<h2 id="f">6) Func مقابل Expression&lt;Func&gt;: فخ الأداء في EF Core</h2>
+<pre><code>Expression&lt;Func&lt;int, bool&gt;&gt; e = n =&gt; n &gt; 5;
+Console.WriteLine(e.Body);            // (n &gt; 5)  ← الـ lambda كبيانات (شجرة)
+Func&lt;int, bool&gt; f = e.Compile();     // تحويل الشجرة لكود
+Console.WriteLine(f(7));              // True</code></pre>
+<p>مع <code>Func</code> الكود بيتنفذ في الـ CLR. مع <code>Expression</code> المكتبة (EF Core) بتقرأ الشجرة وتترجمها <b>لـ SQL</b>. وده السبب إن <code>IQueryable.Where</code> بتاخد Expression، و<code>IEnumerable.Where</code> بتاخد Func.</p>
+<div class="box warn"><p><b class="t">باگ إنتاج حقيقي:</b></p>
+<pre><code>Func&lt;Product, bool&gt; expensive = p =&gt; p.Price &gt; 100;
+var a = db.Products.Where(expensive).ToList();      // SELECT * FROM Products  ← الجدول كله لذاكرتك!
+                                                    // وبعدين الفلترة في الـ C#
+Expression&lt;Func&lt;Product, bool&gt;&gt; expensive2 = p =&gt; p.Price &gt; 100;
+var b = db.Products.Where(expensive2).ToList();     // SELECT ... WHERE Price &gt; 100</code></pre>
+<p>أي دالة بتبني فلاتر قابلة لإعادة الاستخدام على EF لازم تاخد <code>Expression&lt;Func&lt;T,bool&gt;&gt;</code> مش <code>Func</code>. وده من أكتر أسباب بطء الـ API بعد زيادة البيانات.</p></div>
+
+<h2 id="g">7) الـ async lambdas: Action مقابل Func&lt;Task&gt;</h2>
+<pre><code>Action bad = async () =&gt; { await Task.Delay(100); throw new Exception("x"); };
+bad();            // async void: مفيش حد يستنى، والـ exception ممكن تقفل الـ process
+
+Func&lt;Task&gt; good = async () =&gt; { await Task.Delay(100); throw new Exception("x"); };
+try { await good(); } catch (Exception e) { /* تتمسك هنا */ }
+
+items.ForEach(async x =&gt; await SaveAsync(x));              // fire-and-forget، مش هيستنى حاجة
+await Task.WhenAll(items.Select(x =&gt; SaveAsync(x)));        // الصح</code></pre>
+<p><b>ليه؟</b> الـ lambda <code>async () =&gt; ...</code> بتتحول لـ delegate يرجع <code>Task</code> لو الهدف <code>Func&lt;Task&gt;</code>، ولو الهدف <code>Action</code> فبتبقى <code>async void</code> (مفيش Task يرجع، فمفيش مكان تتجمع فيه الأخطاء). كل API بيقبل callback async لازم يقبل <code>Func&lt;Task&gt;</code>.</p>
+
+<h2 id="h">8) أنماط من المشاريع الحقيقية</h2>
+<pre><code>// 1) Retry لأي عملية شبكة
+static async Task&lt;T&gt; Retry&lt;T&gt;(Func&lt;Task&lt;T&gt;&gt; op, int attempts = 3)
+{
+    for (var i = 1; ; i++)
+        try { return await op(); }
+        catch when (i &lt; attempts) { await Task.Delay(200 * i); }
+}
+var user = await Retry(() =&gt; http.GetFromJsonAsync&lt;User&gt;("/users/1"));
+
+// 2) Strategy table بدل switch
+var ops = new Dictionary&lt;string, Func&lt;decimal, decimal, decimal&gt;&gt;
+{
+    ["+"] = (a, b) =&gt; a + b, ["-"] = (a, b) =&gt; a - b, ["*"] = (a, b) =&gt; a * b
+};
+Console.WriteLine(ops["*"](3, 4));    // 12
+
+// 3) Lazy و caching بـ factory delegate
+var cache = new Lazy&lt;Config&gt;(() =&gt; LoadConfig());
+
+// 4) Guard clause بتحوّل exception
+static T Try&lt;T&gt;(Func&lt;T&gt; f, T fallback) { try { return f(); } catch { return fallback; } }</code></pre>
+<p><b>إمتى هتحتاج كل ده؟</b> LINQ في كل مكان (<code>Where/Select/OrderBy</code>)، الـ middleware، و<code>IOptions</code> configuration lambdas (<code>services.Configure(o =&gt; o.X = 1)</code>)، والـ resilience libraries (Polly) كلها delegates.</p>
+
+<footer>الجزء 3: حل كل أسئلة Quick Think مع الفخاخ، تصحيحات السلايدات، أسئلة مقابلات، ومراجع من Medium.</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Delegates (1/3): الأساس والميكانيزم و Multicast</title>
+<style>
+:root{--bg:#f6f7f4;--fg:#1d2327;--mut:#5b6670;--card:#fff;--line:#d9ded8;--acc:#0b6b5c;--warn:#a4440f;--warnbg:#fdf0e6;--code:#10201c;--codefg:#d7efe6;--okbg:#e6f4ef}
+@media(prefers-color-scheme:dark){:root{--bg:#121816;--fg:#e4ebe8;--mut:#9aa8a3;--card:#1a2320;--line:#2c3834;--acc:#4fc2a8;--warn:#f0a066;--warnbg:#2b2118;--code:#0b1210;--okbg:#17302a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.9 "Segoe UI",Tahoma,"Noto Naskh Arabic",system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+main{max-width:900px;margin:0 auto;padding:28px 18px 80px}
+h1{font-size:1.9rem;line-height:1.4;margin:.2em 0}
+h2{font-size:1.4rem;margin:2.2em 0 .5em;padding-inline-start:12px;border-inline-start:5px solid var(--acc)}
+h3{font-size:1.05rem;margin:1.5em 0 .2em;color:var(--acc)}
+p{margin:.55em 0}.lead{color:var(--mut)}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+nav a{color:var(--fg);text-decoration:none;border:1px solid var(--line);background:var(--card);padding:3px 12px;border-radius:6px;font-size:.88rem}
+nav a:hover{border-color:var(--acc);color:var(--acc)}
+pre{direction:ltr;text-align:left;background:var(--code);color:var(--codefg);padding:13px 16px;border-radius:8px;overflow-x:auto;font:13.5px/1.55 Consolas,Menlo,monospace;margin:.6em 0}
+code{direction:ltr;unicode-bidi:embed;font-family:Consolas,Menlo,monospace;font-size:.9em;background:var(--okbg);padding:1px 6px;border-radius:4px}
+pre code{background:none;padding:0;font-size:inherit}
+.box{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:4px 16px;margin:1em 0}
+.warn{background:var(--warnbg);border-color:var(--warn)}.warn .t{color:var(--warn)}
+.ok{background:var(--okbg);border-color:var(--acc)}
+.tw{overflow-x:auto;margin:1em 0}
+table{border-collapse:collapse;width:100%;min-width:520px;background:var(--card)}
+th,td{border:1px solid var(--line);padding:7px 12px;text-align:start;vertical-align:top;font-size:.93rem}
+th{background:var(--okbg)}
+.dg{direction:ltr;overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px;margin:.8em 0}
+.dg svg{min-width:720px;width:100%;height:auto;display:block}
+.bx{fill:var(--card);stroke:var(--acc);stroke-width:1.5}
+.hd{font:700 12.5px Consolas,Menlo,monospace;fill:var(--acc)}.tx{font:11.5px Consolas,Menlo,monospace;fill:var(--fg)}
+.ln{stroke:var(--fg);stroke-width:1.3;fill:none}.ds{stroke-dasharray:5 3}.mk{fill:var(--card);stroke:var(--fg)}.op{fill:none;stroke:var(--fg)}
+.flow{direction:ltr;display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:.8em 0}
+.n{border:1.5px solid var(--acc);border-radius:6px;padding:4px 10px;background:var(--card);font:13px Consolas,Menlo,monospace}
+.a{color:var(--mut)}
+li{margin:.25em 0}
+footer{margin-top:3em;color:var(--mut);font-size:.9rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Delegates (الجزء 1 من 3): الأساس والميكانيزم و Multicast</h1>
+<p class="lead">مبني على سلايدات Session 02 (من سلايد 3 لـ 13). في الجزء 2: الـ Built-in و Anonymous و Lambda و Closures. وفي الجزء 3: حل كل أسئلة Quick Think وتصحيحات ومراجع.</p>
+<nav><a href="#a">1. المشكلة</a><a href="#b">2. الفكرة</a><a href="#c">3. الميكانيزم</a><a href="#d">4. التعريف والاستخدام</a><a href="#e">5. كـ Parameter</a><a href="#f">6. Multicast</a><a href="#g">7. مشاكل الإنتاج</a><a href="#h">8. المقارنة</a></nav>
+
+<h2 id="a">1) المشكلة اللي بيحلها الـ Delegate (سلايد 5)</h2>
+<p>عندك دالة بتعمل خطوات ثابتة، بس خطوة واحدة جواها <b>بتتغير</b> من حالة لحالة (طريقة حساب الخصم مثلاً). من غير delegate هتكتب شرط لكل حالة:</p>
+<pre><code>static decimal Checkout(decimal price, string customerType) =&gt; customerType switch
+{
+    "student" =&gt; price * 0.5m,
+    "vip"     =&gt; price * 0.8m,
+    _         =&gt; price
+};
+// كل نوع عميل جديد = تعديل الدالة دي (تكسر Open/Closed، وتحتاج re-test لكل شيء)</code></pre>
+<p>الحل: خلّي الخطوة المتغيرة <b>باراميتر</b>. الدالة متعرفش الخصم بيتحسب إزاي، بس تعرف شكله (بياخد decimal ويرجع decimal):</p>
+<pre><code>delegate decimal Discount(decimal price);
+
+static decimal Checkout(decimal price, Discount discount) =&gt; discount(price);
+
+Checkout(100m, p =&gt; p * 0.5m);   // student
+Checkout(100m, p =&gt; p * 0.8m);   // vip
+Checkout(100m, p =&gt; p);          // عادي، ومن غير ما نلمس Checkout</code></pre>
+<p><b>الفكرة الأعمق:</b> ده نفس اللي بتعمله بالـ <code>interface</code> في الـ Strategy pattern (<code>IDiscountStrategy</code>)، لكن من غير class و interface كاملين لسلوك من سطر واحد.</p>
+
+<h2 id="b">2) إيه هو الـ Delegate؟ (سلايد 4)</h2>
+<p><b>التشبيه:</b> ريموت التلفزيون. الريموت مش بيعمل التشغيل بنفسه، بس بيشاور على جهاز (method) معين. تبدّل الجهاز اللي الريموت متوصل بيه من غير ما تغيّر الريموت.</p>
+<p><b>التعريف الدقيق:</b> الـ delegate <b>نوع (type)</b> بيمثّل "شكل" دالة: أنواع الـ parameters + نوع الـ return. أي متغير من النوع ده ممكن يشاور على أي دالة بنفس الشكل. وهو type-safe: الـ compiler بيفحص الـ signature.</p>
+<div class="box warn"><p><b class="t">تصحيح لتعبير "function pointer":</b> السلايد بيقول "type-safe function pointer"، وده تبسيط مقبول، لكن الـ delegate <b>object على الـ Heap</b> مش مجرد عنوان. بيحمل كمان الـ <code>this</code> اللي هتتنفذ عليه الدالة (<code>Target</code>)، وده اللي بيخليه أقوى من C function pointer، وهو سبب مشكلة الـ memory leak اللي هنشوفها.</p></div>
+
+<h2 id="c">3) الميكانيزم: المترجم بيعمل إيه؟</h2>
+<p>لما تكتب <code>delegate int MathOperation(int a, int b);</code> المترجم بيولّد <b>class</b> كامل:</p>
+<pre><code>// المتولّد تقريباً
+public sealed class MathOperation : MulticastDelegate
+{
+    public MathOperation(object target, IntPtr method);
+    public int Invoke(int a, int b);     // ينفذ الدالة (أو الـ invocation list)
+}</code></pre>
+<div class="dg">
+<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Delegate class diagram">
+<defs>
+<marker id="tri" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path class="mk" d="M1 1L11 6L1 11Z"/></marker>
+<marker id="ar" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path class="op" d="M1 1L10 6L1 11"/></marker>
+</defs>
+<rect class="bx" x="20" y="15" width="260" height="80" rx="4"/><text class="hd" x="30" y="33">abstract Delegate</text><text class="tx" x="30" y="51">object? Target { get; }</text><text class="tx" x="30" y="67">MethodInfo Method { get; }</text><text class="tx" x="30" y="83">static Combine() / Remove()</text>
+<rect class="bx" x="20" y="125" width="260" height="62" rx="4"/><text class="hd" x="30" y="143">abstract MulticastDelegate</text><text class="tx" x="30" y="161">invocation list (Delegate[])</text><text class="tx" x="30" y="177">GetInvocationList()</text>
+<rect class="bx" x="20" y="220" width="260" height="55" rx="4"/><text class="hd" x="30" y="238">sealed MathOperation</text><text class="tx" x="30" y="256">int Invoke(int a, int b)</text>
+<path class="ln" d="M150 125V95" marker-end="url(#tri)"/><path class="ln" d="M150 220V187" marker-end="url(#tri)"/>
+<rect class="bx" x="400" y="150" width="380" height="110" rx="4"/><text class="hd" x="410" y="170">d : MathOperation  (object على الـ Heap)</text>
+<text class="tx" x="410" y="192">_target         → Calc instance | null (static)</text>
+<text class="tx" x="410" y="210">_methodPtr      → Calc.Add (الكود)</text>
+<text class="tx" x="410" y="228">_invocationList → null | [d1, d2, d3]</text>
+<text class="tx" x="410" y="248">d(10,5) == d.Invoke(10,5)</text>
+<path class="ln ds" d="M400 235H280" marker-end="url(#ar)"/><text class="tx" x="318" y="228">instance of</text>
+</svg></div>
+<ul>
+<li>استدعاء <code>d(10, 5)</code> هو سكر نحوي لـ <code>d.Invoke(10, 5)</code>.</li>
+<li>الـ delegate <b>immutable</b>: كل <code>+=</code> أو <code>-=</code> بيعمل delegate جديد (<code>Delegate.Combine</code>) ويستبدل المتغير.</li>
+<li>التساوي: delegateين متساويين لو نفس الـ <code>Target</code> ونفس الـ <code>Method</code>.</li>
+<li>عشان كده <code>Delegate</code> reference type (class) مش struct، وكل إنشاء لواحد جديد = allocation على الـ Heap.</li>
+</ul>
+<pre><code>class Calc { public int Mul(int a, int b) =&gt; a * b;  public static int Add(int a, int b) =&gt; a + b; }
+
+MathOperation s = Calc.Add;            // static
+MathOperation i = new Calc().Mul;      // instance
+Console.WriteLine(s.Target is null);   // True  (مفيش this)
+Console.WriteLine(i.Target is Calc);   // True  (الـ delegate ماسك الـ object)
+Console.WriteLine(s.Method.Name);      // Add</code></pre>
+
+<h2 id="d">4) التعريف والإنشاء والاستدعاء (سلايد 7 و 8)</h2>
+<pre><code>public delegate int MathOperation(int a, int b);          // 1) التعريف: signature فقط
+
+static int Add(int a, int b)      =&gt; a + b;
+static int Subtract(int a, int b) =&gt; a - b;
+static int Multiply(int a, int b) =&gt; a * b;
+
+MathOperation op1 = new MathOperation(Add);   // الشكل القديم (C# 1)
+MathOperation op2 = Subtract;                 // Method Group Conversion
+MathOperation op3 = (a, b) =&gt; a * b;          // Lambda
+
+Console.WriteLine(op1(10, 5));   // 15
+Console.WriteLine(op2(10, 5));   // 5
+Console.WriteLine(op3(10, 5));   // 50</code></pre>
+<h3>قواعد التطابق (وفيها نقطة السلايد ما بيذكرهاش)</h3>
+<p>السلايد بيقول "الـ signature لازم يتطابق بالظبط". ده غير دقيق. في C# فيه <b>variance</b> للـ delegates مع reference types:</p>
+<pre><code>delegate object Factory(string s);
+
+static string Make(object o) =&gt; o.ToString()!;
+// parameter: object أوسع من string  (Contravariance: يقبل أي string)
+// return   : string أضيق من object  (Covariance: يرجع حاجة تنفع كـ object)
+Factory f = Make;    // يشتغل</code></pre>
+<p>ومع <b>value types</b> (int مقابل long مثلاً) مفيش variance: لازم تطابق تام في النوع.</p>
+
+<h2 id="e">5) الـ Delegate كـ Parameter (سلايد 9): Strategy من الواقع</h2>
+<pre><code>public delegate bool Rule(Order order);
+
+public class OrderValidator
+{
+    private readonly List&lt;(string Name, Rule Check)&gt; _rules = new();
+    public OrderValidator Add(string name, Rule rule) { _rules.Add((name, rule)); return this; }
+    public IEnumerable&lt;string&gt; Validate(Order o) =&gt; _rules.Where(r =&gt; !r.Check(o)).Select(r =&gt; r.Name);
+}
+
+var validator = new OrderValidator()
+    .Add("Has items",    o =&gt; o.Items.Count &gt; 0)
+    .Add("Positive total", o =&gt; o.Total &gt; 0)
+    .Add("Under limit",  o =&gt; o.Total &lt; 100_000);
+
+var failed = validator.Validate(order).ToList();   // أسماء القواعد اللي فشلت
+public record Order(List&lt;string&gt; Items, decimal Total);</code></pre>
+<p><b>إمتى هتحتاجه:</b> قواعد تحقق (validation rules) بتتغير من عميل لعميل، أو خطوات معالجة بتتبدل، أو callbacks. بدل ما تعمل class لكل قاعدة تضيف سطر.</p>
+<h3>الـ Delegates هي أساس الـ ASP.NET Core middleware</h3>
+<div class="flow"><span class="n">Request</span><span class="a">→</span><span class="n">Logging</span><span class="a">→</span><span class="n">Auth</span><span class="a">→</span><span class="n">Endpoint</span><span class="a">←</span><span class="n">Auth</span><span class="a">←</span><span class="n">Logging</span><span class="a">←</span><span class="n">Response</span></div>
+<pre><code>app.Use(async (context, next) =&gt;      // next هو delegate للـ middleware اللي بعده
+{
+    var sw = Stopwatch.StartNew();
+    await next();                        // استدعاء الباقي
+    Console.WriteLine($"{context.Request.Path} took {sw.ElapsedMilliseconds} ms");
+});</code></pre>
+<p>كل middleware بياخد delegate للي بعده ويقرر ينفذه أو لا (مثلاً الـ Auth يوقف الطلب). ده ثمرة فهم الـ delegates فعلاً.</p>
+
+<h2 id="f">6) Multicast Delegates (سلايد 10 إلى 13)</h2>
+<p>الـ delegate ممكن يشاور على <b>أكتر من دالة</b>. الدوال بتتخزن في <b>invocation list</b> وبتتنفذ بترتيب الإضافة.</p>
+<div class="flow"><span class="n">d</span><span class="a">→</span><span class="n">[ Method1 ]</span><span class="a">→ then →</span><span class="n">[ Method2 ]</span><span class="a">→ then →</span><span class="n">[ Method3 ]</span></div>
+<pre><code>delegate void MyDelegate(string msg);
+static void M1(string m) =&gt; Console.WriteLine($"Method1: {m}");
+static void M2(string m) =&gt; Console.WriteLine($"Method2: {m}");
+static void M3(string m) =&gt; Console.WriteLine($"Method3: {m}");
+
+MyDelegate d = M1;
+d += M2;
+d += M3;
+d("Hello");      // Method1, Method2, Method3 بالترتيب
+d -= M2;         // يشيل M2
+d("Again");      // Method1, Method3</code></pre>
+<p>الحقيقة اللي جوه: <code>d += M2</code> هي <code>d = (MyDelegate)Delegate.Combine(d, new MyDelegate(M2))</code>. و<code>-=</code> بتشيل <b>آخر ظهور</b> مطابق للدالة، ولو مش موجودة ما بترميش exception.</p>
+<h3>الـ Return Value (سلايد 12 و 13): آخر واحدة بس</h3>
+<pre><code>Func&lt;int&gt; f = () =&gt; 1;
+f += () =&gt; 2;
+f += () =&gt; 3;
+Console.WriteLine(f());      // 3  (القيم 1 و 2 اتنفذت واتضيعت)
+
+foreach (var h in f.GetInvocationList().Cast&lt;Func&lt;int&gt;&gt;())
+    Console.WriteLine(h());  // 1 ثم 2 ثم 3: لو عايز كل النتائج</code></pre>
+<p><b>ليه كده؟</b> الـ compiler مش عارف يدمج n نتائج في نتيجة واحدة، فالقاعدة بسيطة: ترجع آخر نتيجة. لو محتاج كلها: <code>GetInvocationList()</code>.</p>
+
+<h2 id="g">7) مشاكل حقيقية في الإنتاج</h2>
+<div class="box warn"><p><b class="t">1) NullReferenceException على delegate فاضي</b></p>
+<pre><code>Action? onDone = null;
+onDone();        // NullReferenceException
+onDone?.Invoke(); // الصح</code></pre></div>
+<div class="box warn"><p><b class="t">2) استثناء في واحدة بيوقف الباقي</b></p>
+<pre><code>Action a = () =&gt; Console.WriteLine("A");
+a += () =&gt; throw new Exception("boom");
+a += () =&gt; Console.WriteLine("C");
+try { a(); } catch { }       // طُبع A فقط، C ما اتنفذتش
+
+// الحل لما كل subscriber مستقل (إشعارات مثلاً):
+foreach (var h in a.GetInvocationList().Cast&lt;Action&gt;())
+    try { h(); } catch (Exception ex) { Console.WriteLine($"handler failed: {ex.Message}"); }</code></pre></div>
+<div class="box warn"><p><b class="t">3) Memory leak من الاشتراك في events (الأشهر)</b></p>
+<pre><code>class Publisher { public event EventHandler? Changed; }          // عمره طويل (singleton)
+class Screen
+{
+    public Screen(Publisher p) { p.Changed += OnChanged; }       // الاشتراك
+    void OnChanged(object? s, EventArgs e) { }
+}
+// كل Screen بتتعمل بتتسجل في الـ invocation list بتاعة Publisher.
+// الـ delegate بيحمل Target = Screen، فـ GC مش هيجمعها أبداً.</code></pre>
+<p><b>الحل:</b> <code>p.Changed -= OnChanged</code> في <code>Dispose</code>، أو weak events، أو تأكد إن عمر الـ publisher مش أطول من الـ subscriber. ده في WPF و Blazor Server و الـ background services سبب شائع جداً لتضخم الذاكرة.</p></div>
+<div class="box warn"><p><b class="t">4) delegateين بنفس الـ signature مش قابلين للتبديل</b></p>
+<pre><code>Predicate&lt;int&gt; p = n =&gt; n &gt; 0;
+// Func&lt;int,bool&gt; f = p;                       // CS0029
+Func&lt;int,bool&gt; f = new Func&lt;int,bool&gt;(p);      // يشتغل (delegate يلف delegate)</code></pre>
+<p>كل نوع delegate هو class مستقل، فمفيش علاقة وراثة بين <code>Predicate&lt;int&gt;</code> و <code>Func&lt;int,bool&gt;</code> مهما كان الشكل متطابق.</p></div>
+<div class="box warn"><p><b class="t">5) Thread safety:</b> <code>handler += x</code> مش atomic في الـ field العادي. لو بتشترك من أكتر من thread استخدم <code>event</code> (المترجم بيضيف <code>Interlocked</code> في الـ accessors) أو lock.</p></div>
+
+<h2 id="h">8) Delegate مقابل Interface مقابل Event</h2>
+<div class="tw"><table>
+<tr><th></th><th>Delegate</th><th>Interface</th><th>Event</th></tr>
+<tr><td>الاستخدام</td><td>سلوك واحد (دالة)</td><td>مجموعة سلوكيات وحالة</td><td>إشعار "حصل حاجة"</td></tr>
+<tr><td>التعريف</td><td>سطر واحد، lambda</td><td>class كامل</td><td>delegate + قيود</td></tr>
+<tr><td>Multicast</td><td>نعم</td><td>لا</td><td>نعم</td></tr>
+<tr><td>من برّه الـ class</td><td>أي حد يستدعي ويعيّن</td><td>-</td><td><code>+=</code> و <code>-=</code> بس</td></tr>
+<tr><td>إمتى</td><td>callbacks و strategies بسيطة</td><td>لما السلوك ليه أكتر من دالة أو DI</td><td>الـ Publisher/Subscriber</td></tr>
+</table></div>
+<p><b>قاعدة عملية:</b> لو العقد دالة واحدة استخدم delegate (غالباً <code>Func</code> أو <code>Action</code>)، ولو العقد دالتين فأكتر أو محتاج DI وتسجيل في الـ container استخدم interface.</p>
+
+<footer>الجزء 2: Built-in Delegates و Anonymous Methods و Lambda و Closures. الأمثلة مكتوبة من فهمي ولم أشغلها هنا، جرّبها في console project.</footer>
+</main>
+</body>
+</html>

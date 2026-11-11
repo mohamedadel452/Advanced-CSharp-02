@@ -1,3 +1,9 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+    <File Path="Study_Guide/Delegates_Part1_Core.html" />
+    <File Path="Study_Guide/Delegates_Part2_Lambda_Closures.html" />
+    <File Path="Study_Guide/Delegates_Part3_Quiz_Refs.html" />
+  </Folder>
   <Project Path="Advanced-CSharp-02/Advanced-CSharp-02.csproj" />
 </Solution>
